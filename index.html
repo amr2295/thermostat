@@ -12,6 +12,226 @@
   <style>
     * { box-sizing: border-box; margin: 0; padding: 0; -webkit-tap-highlight-color: transparent; }
     body { font-family: -apple-system, BlinkMacSystemFont, sans-serif; background: #12172a; color: #fff; min-height: 100vh; display: flex; flex-direction: column; align-items: center; padding: 20px 16px 40px; overflow-x: hidden; user-select: none; }
+    #app { display:flex; flex-direction:column; align-items:center; width:100%; max-width:400px; padding-top:16px; }
+    .app-header { display:flex; justify-content:space-between; align-items:center; width:100%; padding-bottom:16px; }
+    .app-title { font-size:13px; letter-spacing:3px; color:#5a6280; text-transform:uppercase; }
+    .nav-tabs { display:flex; width:100%; background:#161b2e; border-radius:16px; padding:4px; gap:2px; margin-bottom:20px; }
+    .nav-tab { flex:1; padding:9px 4px; border-radius:12px; border:none; font-size:11px; font-weight:600; letter-spacing:1px; text-transform:uppercase; cursor:pointer; transition:all 0.2s; background:transparent; color:#404870; }
+    .nav-tab.active { background:#1e2440; color:#c8d0e7; }
+    .mode-tabs { display:flex; gap:8px; margin-bottom:20px; }
+    .mode-tab { padding:8px 22px; border-radius:20px; border:none; font-size:12px; font-weight:600; letter-spacing:2px; text-transform:uppercase; cursor:pointer; transition:all 0.2s; background:#1e2440; color:#5a6280; }
+    .mode-tab.heat.active { background:#5c2d1a; color:#e87c50; }
+    .mode-tab.cool.active { background:#1a2d5c; color:#50a0e8; }
+    .mode-tab.off.active { background:#2a2e3a; color:#9090a0; }
+    .unit-toggle { display:flex; background:#161b2e; border-radius:20px; padding:3px; gap:2px; margin-bottom:20px; }
+    .unit-btn { padding:6px 18px; border-radius:16px; border:none; font-size:12px; font-weight:600; cursor:pointer; transition:all 0.2s; background:transparent; color:#404870; }
+    .unit-btn.active { background:#1e2440; color:#c8d0e7; }
+    .thermostat-circle { width:240px; height:240px; border-radius:50%; background:radial-gradient(circle at 40% 35%,#1e2850,#111828); border:1px solid #2a3050; box-shadow:0 0 60px rgba(0,0,0,0.5),inset 0 1px 0 rgba(255,255,255,0.05); display:flex; flex-direction:column; align-items:center; justify-content:center; position:relative; margin-bottom:28px; flex-shrink:0; transition:box-shadow 0.5s; }
+    .arc-container { position:absolute; top:-10px; left:-10px; right:-10px; bottom:-10px; }
+    .arc-container svg { width:100%; height:100%; }
+    .current-temp { font-size:76px; font-weight:200; line-height:1; color:#d0d8f0; position:relative; }
+    .current-temp .unit { font-size:22px; font-weight:300; position:absolute; top:10px; right:-26px; color:#8090b0; }
+    .status-label { font-size:12px; letter-spacing:3px; color:#5a6a8a; text-transform:uppercase; margin-top:6px; }
+    .humidity-label { font-size:12px; color:#3d5070; margin-top:4px; }
+    .status-bar { display:flex; align-items:center; gap:8px; padding:10px 16px; background:#161b2e; border-radius:12px; width:100%; margin-bottom:20px; }
+    .status-dot { width:8px; height:8px; border-radius:50%; background:#3a4060; flex-shrink:0; }
+    .status-dot.heating { background:#e87c50; box-shadow:0 0 8px #e87c50; }
+    .status-dot.cooling { background:#50a0e8; box-shadow:0 0 8px #50a0e8; }
+    .status-dot.idle { background:#5a8a70; }
+    .status-text { font-size:12px; color:#5a6280; flex:1; }
+    .schedule-badge { font-size:10px; background:#1e3a28; color:#5aaa70; padding:2px 8px; border-radius:10px; letter-spacing:1px; }
+    @keyframes pulse { 0%,100%{opacity:1} 50%{opacity:0.5} }
+    .status-dot.heating,.status-dot.cooling { animation:pulse 2s infinite; }
+    .section { width:100%; margin-bottom:20px; }
+    .section-label { font-size:11px; letter-spacing:3px; color:#404870; text-transform:uppercase; text-align:center; margin-bottom:14px; }
+    .temp-control { display:flex; align-items:center; justify-content:center; gap:20px; }
+    .ctrl-btn { width:60px; height:60px; border-radius:50%; border:none; background:#1a2040; color:#8090b0; font-size:26px; cursor:pointer; display:flex; align-items:center; justify-content:center; transition:all 0.15s; box-shadow:0 4px 12px rgba(0,0,0,0.3); }
+    .ctrl-btn:active { transform:scale(0.92); background:#242850; }
+    .set-temp-display { font-size:52px; font-weight:200; color:#c0c8e0; min-width:110px; text-align:center; position:relative; }
+    .set-temp-display .unit { font-size:16px; color:#606888; position:absolute; top:8px; right:-16px; }
+    .divider { width:100%; height:1px; background:#1e2438; margin:4px 0 20px; }
+    .range-section { width:100%; background:#161b2e; border-radius:20px; padding:16px 20px; margin-bottom:20px; }
+    .range-section .section-label { text-align:left; margin-bottom:8px; }
+    .range-row { display:flex; align-items:center; justify-content:space-between; padding:10px 0; }
+    .range-row+.range-row { border-top:1px solid #1e2438; }
+    .range-label { font-size:12px; letter-spacing:2px; text-transform:uppercase; width:70px; }
+    .range-ctrl { display:flex; align-items:center; gap:14px; }
+    .range-btn { width:36px; height:36px; border-radius:50%; border:none; background:#1e2440; color:#8090b0; font-size:18px; cursor:pointer; display:flex; align-items:center; justify-content:center; transition:all 0.15s; }
+    .range-btn:active { transform:scale(0.92); }
+    .range-temp { font-size:26px; font-weight:200; color:#c0c8e0; min-width:60px; text-align:center; }
+    .range-temp .unit { font-size:12px; color:#606888; }
+    .unset { color:#3a4060!important; font-size:20px!important; }
+    #schedule-view { display:none; flex-direction:column; width:100%; gap:14px; }
+    .schedule-header { font-size:13px; letter-spacing:2px; color:#5a6280; text-transform:uppercase; text-align:center; padding-bottom:4px; }
+    .schedule-card { background:#161b2e; border-radius:20px; padding:18px 20px; }
+    .schedule-card-header { display:flex; justify-content:space-between; align-items:center; margin-bottom:14px; }
+    .schedule-card-title { font-size:13px; font-weight:600; color:#c8d0e7; letter-spacing:1px; }
+    .toggle-switch { position:relative; width:44px; height:24px; }
+    .toggle-switch input { opacity:0; width:0; height:0; }
+    .toggle-slider { position:absolute; cursor:pointer; top:0; left:0; right:0; bottom:0; background:#2a3050; border-radius:24px; transition:.3s; }
+    .toggle-slider:before { position:absolute; content:""; height:18px; width:18px; left:3px; bottom:3px; background:#5a6280; border-radius:50%; transition:.3s; }
+    input:checked + .toggle-slider { background:#3d6b5e; }
+    input:checked + .toggle-slider:before { transform:translateX(20px); background:#7fffd4; }
+    .schedule-row { display:flex; align-items:center; justify-content:space-between; padding:8px 0; }
+    .schedule-row + .schedule-row { border-top:1px solid #1e2438; }
+    .schedule-row-label { font-size:12px; color:#8090b0; letter-spacing:1px; }
+    .time-input { background:#1e2440; border:none; border-radius:10px; color:#c8d0e7; font-size:16px; padding:6px 12px; width:110px; text-align:center; font-family:-apple-system,sans-serif; cursor:pointer; }
+    .time-input:focus { outline:none; background:#252d50; }
+    .schedule-temp-ctrl { display:flex; align-items:center; gap:10px; }
+    .sched-btn { width:30px; height:30px; border-radius:50%; border:none; background:#1e2440; color:#8090b0; font-size:16px; cursor:pointer; display:flex; align-items:center; justify-content:center; }
+    .sched-btn:active { transform:scale(0.92); }
+    .sched-temp { font-size:22px; font-weight:200; color:#c0c8e0; min-width:54px; text-align:center; }
+    .sched-temp .u { font-size:12px; color:#606888; }
+    .schedule-active-banner { background:#1e3a28; border-radius:12px; padding:10px 16px; display:flex; align-items:center; gap:10px; }
+    .schedule-active-dot { width:8px; height:8px; border-radius:50%; background:#5aaa70; box-shadow:0 0 6px #5aaa70; animation:pulse 2s infinite; flex-shrink:0; }
+    .schedule-active-text { font-size:12px; color:#5aaa70; }
+    .schedule-inactive-banner { background:#161b2e; border-radius:12px; padding:10px 16px; display:flex; align-items:center; gap:10px; }
+    .schedule-inactive-dot { width:8px; height:8px; border-radius:50%; background:#3a4060; flex-shrink:0; }
+    .schedule-inactive-text { font-size:12px; color:#404870; }
+  </style>
+</head>
+<body>
+<div id="app">
+  <div class="app-header"><div class="app-title">&#127777;&#65039; Thermostat</div></div>
+  <div class="nav-tabs">
+    <button class="nav-tab active" id="nav-home" onclick="showView('home')">Home</button>
+    <button class="nav-tab" id="nav-schedule" onclick="showView('schedule')">Schedule</button>
+  </div>
+
+  <!-- HOME VIEW -->
+  <div id="home-view" style="display:flex;flex-direction:column;align-items:center;width:100%;">
+    <div class="mode-tabs">
+      <button class="mode-tab heat" id="tab-heat" onclick="setMode('heat')">Heat</button>
+      <button class="mode-tab cool" id="tab-cool" onclick="setMode('cool')">Cool</button>
+      <button class="mode-tab off" id="tab-off" onclick="setMode('off')">Off</button>
+    </div>
+    <div class="unit-toggle">
+      <button class="unit-btn active" id="btn-f" onclick="setUnit('F')">&deg;F</button>
+      <button class="unit-btn" id="btn-c" onclick="setUnit('C')">&deg;C</button>
+    </div>
+    <div class="thermostat-circle" id="circle">
+      <div class="arc-container">
+        <svg viewBox="0 0 260 260">
+          <circle cx="130" cy="130" r="122" fill="none" stroke="#1e2440" stroke-width="4" stroke-dasharray="766" stroke-dashoffset="195" stroke-linecap="round" transform="rotate(135 130 130)"/>
+          <circle cx="130" cy="130" r="122" fill="none" id="arc" stroke="#e87c50" stroke-width="4" stroke-dasharray="766" stroke-dashoffset="766" stroke-linecap="round" transform="rotate(135 130 130)" style="transition:stroke-dashoffset 0.5s,stroke 0.5s;"/>
+        </svg>
+      </div>
+      <div class="current-temp" id="cur">72<span class="unit">&deg;F</span></div>
+      <div class="status-label" id="slabel">IDLE</div>
+      <div class="humidity-label" id="hum">32% humidity</div>
+    </div>
+    <div class="status-bar">
+      <div class="status-dot idle" id="sdot"></div>
+      <div class="status-text" id="stext">System idle</div>
+      <div class="schedule-badge" id="sched-badge" style="display:none;">SCHED</div>
+    </div>
+    <div class="section">
+      <div class="section-label">Set Temperature</div>
+      <div class="temp-control">
+        <button class="ctrl-btn" onclick="adj(-1)">&minus;</button>
+        <div class="set-temp-display" id="stmp">66<span class="unit">&deg;F</span></div>
+        <button class="ctrl-btn" onclick="adj(1)">+</button>
+      </div>
+    </div>
+    <div class="divider"></div>
+    <div class="range-section">
+      <div class="section-label">Set Temperature Range</div>
+      <div class="range-row">
+        <div class="range-label" style="color:#e87c5099;">Heat to</div>
+        <div class="range-ctrl">
+          <button class="range-btn" onclick="adjR('h',-1)">&minus;</button>
+          <div class="range-temp"><span id="hv" class="unset">--</span><span class="unit">&deg;F</span></div>
+          <button class="range-btn" onclick="adjR('h',1)">+</button>
+        </div>
+      </div>
+      <div class="range-row">
+        <div class="range-label" style="color:#50a0e899;">Cool to</div>
+        <div class="range-ctrl">
+          <button class="range-btn" onclick="adjR('c',-1)">&minus;</button>
+          <div class="range-temp"><span id="cv" class="unset">--</span><span class="unit">&deg;F</span></div>
+          <button class="range-btn" onclick="adjR('c',1)">+</button>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- SCHEDULE VIEW -->
+  <div id="schedule-view">
+    <div class="schedule-header">Schedule</div>
+    <div id="sched-status-banner" class="schedule-inactive-banner">
+      <div class="schedule-inactive-dot" id="sched-status-dot"></div>
+      <div class="schedule-inactive-text" id="sched-status-text">No schedule active right now</div>
+    </div>
+    <div class="schedule-card">
+      <div class="schedule-card-header">
+        <div class="schedule-card-title">&#127769; Night Schedule</div>
+        <label class="toggle-switch"><input type="checkbox" id="night-toggle" onchange="saveSchedule()"><span class="toggle-slider"></span></label>
+      </div>
+      <div class="schedule-row"><div class="schedule-row-label">From</div><input type="time" class="time-input" id="night-start" value="22:00" onchange="saveSchedule()"></div>
+      <div class="schedule-row"><div class="schedule-row-label">To</div><input type="time" class="time-input" id="night-end" value="10:00" onchange="saveSchedule()"></div>
+      <div class="schedule-row">
+        <div class="schedule-row-label">Heat to</div>
+        <div class="schedule-temp-ctrl">
+          <button class="sched-btn" onclick="adjSchedTemp('night',-1)">&minus;</button>
+          <div class="sched-temp"><span id="night-temp">68</span><span class="u">&deg;F</span></div>
+          <button class="sched-btn" onclick="adjSchedTemp('night',1)">+</button>
+        </div>
+      </div>
+    </div>
+    <div class="schedule-card">
+      <div class="schedule-card-header">
+        <div class="schedule-card-title">&#9728;&#65039; Day Schedule</div>
+        <label class="toggle-switch"><input type="checkbox" id="day-toggle" onchange="saveSchedule()"><span class="toggle-slider"></span></label>
+      </div>
+      <div class="schedule-row"><div class="schedule-row-label">From</div><input type="time" class="time-input" id="day-start" value="10:00" onchange="saveSchedule()"></div>
+      <div class="schedule-row"><div class="schedule-row-label">To</div><input type="time" class="time-input" id="day-end" value="22:00" onchange="saveSchedule()"></div>
+      <div class="schedule-row">
+        <div class="schedule-row-label">Heat to</div>
+        <div class="schedule-temp-ctrl">
+          <button class="sched-btn" onclick="adjSchedTemp('day',-1)">&minus;</button>
+          <div class="sched-temp"><span id="day-temp">70</span><span class="u">&deg;F</span></div>
+          <button class="sched-btn" onclick="adjSchedTemp('day',1)">+</button>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<script>
+let S=JSON.parse(localStorage.getItem('ts3')||'null')||{cur:72,set:66,hr:null,cr:null,mode:'heat',unit:'F',hum:32};
+let SC=JSON.parse(localStorage.getItem('sc3')||'null')||{nightOn:true,nightStart:'22:00',nightEnd:'10:00',nightTemp:68,dayOn:false,dayStart:'10:00',dayEnd:'22:00',dayTemp:70};
+function save(){localStorage.setItem('ts3',JSON.stringify(S));}
+function saveSchedule(){SC.nightOn=document.getElementById('night-toggle').checked;SC.nightStart=document.getElementById('night-start').value;SC.nightEnd=document.getElementById('night-end').value;SC.nightTemp=parseInt(document.getElementById('night-temp').textContent);SC.dayOn=document.getElementById('day-toggle').checked;SC.dayStart=document.getElementById('day-start').value;SC.dayEnd=document.getElementById('day-end').value;SC.dayTemp=parseInt(document.getElementById('day-temp').textContent);localStorage.setItem('sc3',JSON.stringify(SC));checkSchedule();}
+function timeToMins(t){const[h,m]=t.split(':').map(Number);return h*60+m;}
+function nowMins(){const n=new Date();return n.getHours()*60+n.getMinutes();}
+function inRange(s,e,now){const sm=timeToMins(s),em=timeToMins(e);return sm<=em?now>=sm&&now<em:now>=sm||now<em;}
+function checkSchedule(){const now=nowMins();let active=false,schedTemp=null,schedLabel='';if(SC.nightOn&&inRange(SC.nightStart,SC.nightEnd,now)){active=true;schedTemp=SC.nightTemp;schedLabel='Night schedule — heating to '+SC.nightTemp+'°'+S.unit;}else if(SC.dayOn&&inRange(SC.dayStart,SC.dayEnd,now)){active=true;schedTemp=SC.dayTemp;schedLabel='Day schedule — heating to '+SC.dayTemp+'°'+S.unit;}const banner=document.getElementById('sched-status-banner'),dot=document.getElementById('sched-status-dot'),txt=document.getElementById('sched-status-text'),badge=document.getElementById('sched-badge');if(active){banner.className='schedule-active-banner';dot.className='schedule-active-dot';txt.className='schedule-active-text';txt.textContent=schedLabel;badge.style.display='block';if(schedTemp!==null&&S.mode==='heat'){S.set=schedTemp;save();}}else{banner.className='schedule-inactive-banner';dot.className='schedule-inactive-dot';txt.className='schedule-inactive-text';txt.textContent='No schedule active right now';badge.style.display='none';}upd();}
+function loadScheduleUI(){document.getElementById('night-toggle').checked=SC.nightOn;document.getElementById('night-start').value=SC.nightStart;document.getElementById('night-end').value=SC.nightEnd;document.getElementById('night-temp').textContent=SC.nightTemp;document.getElementById('day-toggle').checked=SC.dayOn;document.getElementById('day-start').value=SC.dayStart;document.getElementById('day-end').value=SC.dayEnd;document.getElementById('day-temp').textContent=SC.dayTemp;}
+function adjSchedTemp(w,d){if(w==='night'){SC.nightTemp=Math.max(50,Math.min(90,SC.nightTemp+d));document.getElementById('night-temp').textContent=SC.nightTemp;}else{SC.dayTemp=Math.max(50,Math.min(90,SC.dayTemp+d));document.getElementById('day-temp').textContent=SC.dayTemp;}saveSchedule();}
+function showView(v){document.getElementById('home-view').style.display=v==='home'?'flex':'none';document.getElementById('schedule-view').style.display=v==='schedule'?'flex':'none';document.getElementById('nav-home').classList.toggle('active',v==='home');document.getElementById('nav-schedule').classList.toggle('active',v==='schedule');if(v==='schedule'){loadScheduleUI();checkSchedule();}}
+function setMode(m){S.mode=m;['heat','cool','off'].forEach(t=>document.getElementById('tab-'+t).classList.toggle('active',t===m));upd();save();}
+function setUnit(u){if(S.unit===u)return;if(u==='C'){S.cur=Math.round((S.cur-32)*5/9*10)/10;S.set=Math.round((S.set-32)*5/9);if(S.hr!==null)S.hr=Math.round((S.hr-32)*5/9);if(S.cr!==null)S.cr=Math.round((S.cr-32)*5/9);SC.nightTemp=Math.round((SC.nightTemp-32)*5/9);SC.dayTemp=Math.round((SC.dayTemp-32)*5/9);}else{S.cur=Math.round((S.cur*9/5+32)*10)/10;S.set=Math.round(S.set*9/5+32);if(S.hr!==null)S.hr=Math.round(S.hr*9/5+32);if(S.cr!==null)S.cr=Math.round(S.cr*9/5+32);SC.nightTemp=Math.round(SC.nightTemp*9/5+32);SC.dayTemp=Math.round(SC.dayTemp*9/5+32);}S.unit=u;localStorage.setItem('sc3',JSON.stringify(SC));upd();save();}
+function adj(d){let mn=S.unit==='F'?50:10,mx=S.unit==='F'?90:32;S.set=Math.max(mn,Math.min(mx,S.set+d));upd();save();}
+function adjR(t,d){let mn=S.unit==='F'?50:10,mx=S.unit==='F'?90:32;if(t==='h')S.hr=S.hr===null?S.set:Math.max(mn,Math.min(mx,S.hr+d));else S.cr=S.cr===null?S.set:Math.max(mn,Math.min(mx,S.cr+d));upd();save();}
+function upd(){let u=S.unit,c=Math.round(S.cur);document.getElementById('cur').innerHTML=c+'<span class="unit">°'+u+'</span>';document.getElementById('stmp').innerHTML=S.set+'<span class="unit">°'+u+'</span>';document.getElementById('btn-f').classList.toggle('active',u==='F');document.getElementById('btn-c').classList.toggle('active',u==='C');['heat','cool','off'].forEach(t=>document.getElementById('tab-'+t).classList.toggle('active',t===S.mode));let hv=document.getElementById('hv'),cv=document.getElementById('cv');if(S.hr!==null){hv.textContent=S.hr;hv.classList.remove('unset');}else{hv.textContent='--';hv.classList.add('unset');}if(S.cr!==null){cv.textContent=S.cr;cv.classList.remove('unset');}else{cv.textContent='--';cv.classList.add('unset');}let dot=document.getElementById('sdot'),sl=document.getElementById('slabel'),st=document.getElementById('stext'),circ=document.getElementById('circle');dot.className='status-dot';if(S.mode==='off'){sl.textContent='OFF';st.textContent='Thermostat is off';dot.classList.add('idle');circ.style.boxShadow='';}else if(S.mode==='heat'&&c<S.set-0.5){sl.textContent='HEATING';st.textContent='Heating to '+S.set+'°'+u;dot.classList.add('heating');circ.style.boxShadow='0 0 60px rgba(232,124,80,.2),inset 0 1px 0 rgba(255,255,255,.05)';}else if(S.mode==='cool'&&c>S.set+0.5){sl.textContent='COOLING';st.textContent='Cooling to '+S.set+'°'+u;dot.classList.add('cooling');circ.style.boxShadow='0 0 60px rgba(80,160,232,.2),inset 0 1px 0 rgba(255,255,255,.05)';}else{sl.textContent='IDLE';st.textContent='At target temperature';dot.classList.add('idle');circ.style.boxShadow='';}document.getElementById('hum').textContent=S.hum+'% humidity';let mn=u==='F'?50:10,mx=u==='F'?90:32,pct=Math.max(0,Math.min(1,(c-mn)/(mx-mn)));let arcEl=document.getElementById('arc'),total=766*0.75,prog=pct*total;arcEl.setAttribute('stroke-dashoffset',766-prog);arcEl.setAttribute('stroke',S.mode==='cool'?'#50a0e8':S.mode==='heat'?'#e87c50':'#5a8a70');document.getElementById('night-temp').textContent=SC.nightTemp;document.getElementById('day-temp').textContent=SC.dayTemp;document.querySelectorAll('.sched-temp .u').forEach(el=>el.textContent='°'+u);}
+upd();loadScheduleUI();checkSchedule();
+setInterval(()=>{S.cur=Math.round((S.cur+(Math.random()-.5)*0.4)*10)/10;upd();save();checkSchedule();},60000);
+</script>
+</body>
+</html><!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+  <meta name="apple-mobile-web-app-capable" content="yes">
+  <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+  <meta name="apple-mobile-web-app-title" content="Thermostat">
+  <meta name="theme-color" content="#12172a">
+  <link rel="apple-touch-icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 180 180'%3E%3Crect width='180' height='180' rx='40' fill='%2312172a'/%3E%3Ccircle cx='90' cy='82' r='52' fill='none' stroke='%23e87c50' stroke-width='6'/%3E%3Ccircle cx='90' cy='82' r='38' fill='%231e2850'/%3E%3Ctext x='90' y='92' text-anchor='middle' font-size='32' font-weight='200' fill='%23d0d8f0' font-family='Helvetica'%3E72%3C/text%3E%3Ctext x='90' y='108' text-anchor='middle' font-size='12' fill='%235a6a8a' font-family='Helvetica' letter-spacing='3'%3EIDL%3C/text%3E%3Crect x='68' y='146' width='44' height='18' rx='9' fill='%235c2d1a'/%3E%3Ctext x='90' y='159' text-anchor='middle' font-size='10' font-weight='700' fill='%23e87c50' font-family='Helvetica' letter-spacing='2'%3EHEAT%3C/text%3E%3C/svg%3E">
+  <title>Thermostat</title>
+  <style>
+    * { box-sizing: border-box; margin: 0; padding: 0; -webkit-tap-highlight-color: transparent; }
+    body { font-family: -apple-system, BlinkMacSystemFont, sans-serif; background: #12172a; color: #fff; min-height: 100vh; display: flex; flex-direction: column; align-items: center; padding: 20px 16px 40px; overflow-x: hidden; user-select: none; }
     #pin-screen { display:flex; flex-direction:column; align-items:center; justify-content:center; min-height:100vh; width:100%; gap:20px; }
     .pin-icon { font-size:48px; }
     .pin-title { font-size:28px; font-weight:300; color:#c8d0e7; letter-spacing:2px; }

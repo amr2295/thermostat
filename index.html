@@ -1,273 +1,104 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-<meta charset="UTF-8">
-<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-<meta name="apple-mobile-web-app-capable" content="yes">
-<meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
-<meta name="apple-mobile-web-app-title" content="Thermostat">
-<meta name="theme-color" content="#2d0a1f">
-<link rel="apple-touch-icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 180 180'%3E%3Crect width='180' height='180' rx='40' fill='%231a0a1a'/%3E%3Ccircle cx='90' cy='82' r='48' fill='none' stroke='%233d1a3d' stroke-width='4'/%3E%3Ccircle cx='90' cy='82' r='48' fill='none' stroke='%23ff69b4' stroke-width='4' stroke-dasharray='301' stroke-dashoffset='75' stroke-linecap='round' transform='rotate(-90 90 82)'/%3E%3Ccircle cx='90' cy='82' r='40' fill='%23250a25'/%3E%3Ctext x='90' y='90' text-anchor='middle' font-family='-apple-system,sans-serif' font-size='28' font-weight='200' fill='white'%3E72%3C/text%3E%3Ctext x='90' y='108' text-anchor='middle' font-family='-apple-system,sans-serif' font-size='11' fill='%23ff69b4' letter-spacing='2'%3ETHERMOSTAT%3C/text%3E%3C/svg%3E">
-<title>my thermostat 🌸</title>
+<meta charset="UTF-8"/>
+<meta name="viewport" content="width=device-width,initial-scale=1"/>
+<meta name="apple-mobile-web-app-capable" content="yes"/>
+<meta name="apple-mobile-web-app-status-bar-style" content="black-translucent"/>
+<meta name="theme-color" content="#111827"/>
+<title>Thermostat</title>
 <style>
-@import url('https://fonts.googleapis.com/css2?family=Quicksand:wght@400;500;600;700&display=swap');
-*{box-sizing:border-box;margin:0;padding:0;-webkit-tap-highlight-color:transparent}
-body{font-family:'Quicksand',sans-serif;background:linear-gradient(160deg,#2d0a1f 0%,#1a0a2e 50%,#2d0a1f 100%);color:#fff;min-height:100vh;display:flex;flex-direction:column;align-items:center;width:100%;max-width:420px;margin:0 auto;padding:16px 16px 40px}
-#app{display:flex;flex-direction:column;align-items:center;width:100%}
-.app-header{display:flex;justify-content:space-between;align-items:center;width:100%;padding-bottom:12px}
-.app-title{font-size:15px;font-weight:700;letter-spacing:2px;background:linear-gradient(90deg,#ff69b4,#ffb6d9,#c77dff);-webkit-background-clip:text;-webkit-text-fill-color:transparent;text-transform:uppercase}
-.conn-dot{width:9px;height:9px;border-radius:50%;background:#3a2040;flex-shrink:0;transition:all .3s}
-.conn-dot.online{background:#ff69b4;box-shadow:0 0 8px #ff69b4}
-.conn-dot.error{background:#ff4466;box-shadow:0 0 8px #ff4466}
-.nav-tabs{display:flex;width:100%;background:rgba(255,105,180,.08);border:1px solid rgba(255,105,180,.2);border-radius:20px;padding:4px;gap:4px;margin-bottom:18px;backdrop-filter:blur(10px)}
-.nav-tab{flex:1;padding:9px 4px;border-radius:16px;border:none;font-family:'Quicksand',sans-serif;font-size:12px;font-weight:700;letter-spacing:1px;text-transform:uppercase;cursor:pointer;transition:all .25s;background:transparent;color:rgba(255,182,217,.5)}
-.nav-tab.active{background:linear-gradient(135deg,#ff69b4,#c77dff);color:#fff;box-shadow:0 4px 15px rgba(255,105,180,.4)}
-.mode-tabs{display:flex;gap:8px;margin-bottom:18px}
-.mode-tab{padding:8px 20px;border-radius:20px;border:1px solid rgba(255,105,180,.2);font-family:'Quicksand',sans-serif;font-size:12px;font-weight:700;letter-spacing:1px;text-transform:uppercase;cursor:pointer;transition:all .25s;background:rgba(255,105,180,.05);color:rgba(255,182,217,.4)}
-.mode-tab.heat.active{background:linear-gradient(135deg,#ff4d8d,#ff69b4);color:#fff;border-color:transparent;box-shadow:0 4px 15px rgba(255,77,141,.4)}
-.mode-tab.cool.active{background:linear-gradient(135deg,#7b5ea7,#c77dff);color:#fff;border-color:transparent;box-shadow:0 4px 15px rgba(199,125,255,.4)}
-.mode-tab.off.active{background:rgba(255,105,180,.15);color:rgba(255,182,217,.7);border-color:rgba(255,105,180,.3)}
-.unit-toggle{display:flex;background:rgba(255,105,180,.08);border:1px solid rgba(255,105,180,.2);border-radius:20px;padding:3px;gap:2px;margin-bottom:18px}
-.unit-btn{padding:6px 18px;border-radius:16px;border:none;font-family:'Quicksand',sans-serif;font-size:12px;font-weight:700;cursor:pointer;transition:all .25s;background:transparent;color:rgba(255,182,217,.4)}
-.unit-btn.active{background:linear-gradient(135deg,#ff69b4,#c77dff);color:#fff;box-shadow:0 2px 10px rgba(255,105,180,.3)}
-.thermostat-circle{position:relative;width:240px;height:240px;margin-bottom:18px}
-.arc-container{position:absolute;inset:0}
-.circle-content{position:absolute;inset:0;display:flex;flex-direction:column;align-items:center;justify-content:center}
-.current-temp{font-size:64px;font-weight:700;line-height:1;background:linear-gradient(180deg,#fff 0%,#ffb6d9 100%);-webkit-background-clip:text;-webkit-text-fill-color:transparent;position:relative}
-.cur-unit{font-size:20px;font-weight:600;position:absolute;top:8px;right:-22px;background:linear-gradient(180deg,#ffb6d9,#ff69b4);-webkit-background-clip:text;-webkit-text-fill-color:transparent}
-.status-label{font-size:11px;letter-spacing:2px;color:rgba(255,182,217,.6);text-transform:uppercase;margin-top:4px;font-weight:600}
-.humidity-label{font-size:11px;color:rgba(255,182,217,.4);margin-top:3px;font-weight:500}
-.status-bar{display:flex;align-items:center;gap:10px;padding:10px 16px;background:rgba(255,105,180,.08);border:1px solid rgba(255,105,180,.15);border-radius:16px;width:100%;margin-bottom:18px;backdrop-filter:blur(5px)}
-.status-dot{width:8px;height:8px;border-radius:50%;background:#3a2040;flex-shrink:0}
-.status-dot.heating{background:#ff69b4;box-shadow:0 0 8px #ff69b4;animation:pulse 2s infinite}
-.status-dot.cooling{background:#c77dff;box-shadow:0 0 8px #c77dff;animation:pulse 2s infinite}
-.status-dot.idle{background:#ff69b4;opacity:.5}
-@keyframes pulse{0%,100%{opacity:1}50%{opacity:.4}}
-@keyframes sparkle{0%,100%{transform:scale(1) rotate(0deg);opacity:1}50%{transform:scale(1.2) rotate(10deg);opacity:.8}}
-.status-text{font-size:12px;color:rgba(255,182,217,.7);flex:1;font-weight:600}
-.schedule-badge{font-size:10px;background:linear-gradient(135deg,#ff69b4,#c77dff);color:#fff;padding:3px 10px;border-radius:10px;letter-spacing:1px;font-weight:700}
-.quick-btn{width:100%;padding:16px;border-radius:20px;border:none;font-family:'Quicksand',sans-serif;font-size:18px;font-weight:700;cursor:pointer;background:linear-gradient(135deg,#ff4d8d,#ff69b4,#ffb6d9);color:#fff;box-shadow:0 6px 25px rgba(255,77,141,.5);letter-spacing:1px;margin-bottom:18px;transition:all .2s;position:relative;overflow:hidden}
-.quick-btn:before{content:'';position:absolute;inset:0;background:linear-gradient(135deg,rgba(255,255,255,.15),transparent);border-radius:20px}
-.quick-btn:active{transform:scale(.97);box-shadow:0 3px 15px rgba(255,77,141,.4)}
-.quick-btn-label{font-size:11px;opacity:.85;display:block;letter-spacing:2px;font-weight:600;margin-bottom:2px;text-transform:uppercase}
-.section{width:100%;margin-bottom:18px}
-.section-label{font-size:11px;letter-spacing:2px;color:rgba(255,182,217,.5);text-transform:uppercase;text-align:center;margin-bottom:12px;font-weight:700}
-.temp-control{display:flex;align-items:center;justify-content:center;gap:16px}
-.ctrl-btn{width:58px;height:58px;border-radius:50%;border:1px solid rgba(255,105,180,.3);background:rgba(255,105,180,.08);color:rgba(255,182,217,.7);font-size:28px;cursor:pointer;display:flex;align-items:center;justify-content:center;transition:all .2s;font-family:'Quicksand',sans-serif;font-weight:300}
-.ctrl-btn:active{transform:scale(.92);background:rgba(255,105,180,.2);border-color:rgba(255,105,180,.6)}
-.set-temp-display{font-size:50px;font-weight:700;background:linear-gradient(135deg,#ff69b4,#c77dff);-webkit-background-clip:text;-webkit-text-fill-color:transparent;min-width:110px;text-align:center;position:relative;line-height:1.1}
-.stmp-unit{font-size:16px;position:absolute;top:8px;right:-14px;background:linear-gradient(135deg,#ff69b4,#c77dff);-webkit-background-clip:text;-webkit-text-fill-color:transparent}
-.divider{width:100%;height:1px;background:linear-gradient(90deg,transparent,rgba(255,105,180,.3),transparent);margin:4px 0 18px}
-.range-section{width:100%;background:rgba(255,105,180,.06);border:1px solid rgba(255,105,180,.15);border-radius:20px;padding:16px 18px;margin-bottom:18px}
-.range-section .section-label{text-align:left;margin-bottom:8px}
-.range-row{display:flex;align-items:center;justify-content:space-between;padding:10px 0}
-.range-row+.range-row{border-top:1px solid rgba(255,105,180,.1)}
-.range-label{font-size:11px;letter-spacing:1px;text-transform:uppercase;width:65px;font-weight:700}
-.range-ctrl{display:flex;align-items:center;gap:12px}
-.range-btn{width:34px;height:34px;border-radius:50%;border:1px solid rgba(255,105,180,.25);background:rgba(255,105,180,.08);color:rgba(255,182,217,.7);font-size:18px;cursor:pointer;display:flex;align-items:center;justify-content:center;transition:all .2s}
-.range-btn:active{transform:scale(.92);background:rgba(255,105,180,.2)}
-.range-temp{font-size:22px;font-weight:700;background:linear-gradient(135deg,#ff69b4,#c77dff);-webkit-background-clip:text;-webkit-text-fill-color:transparent;min-width:55px;text-align:center}
-.schedule-card{width:100%;background:rgba(255,105,180,.06);border:1px solid rgba(255,105,180,.15);border-radius:20px;padding:16px;margin-bottom:14px}
-.schedule-card-header{display:flex;justify-content:space-between;align-items:center;margin-bottom:12px}
-.schedule-card-title{font-size:12px;letter-spacing:1px;text-transform:uppercase;color:rgba(255,182,217,.7);font-weight:700}
-.toggle-switch{position:relative;display:inline-block;width:44px;height:24px}
-.toggle-switch input{opacity:0;width:0;height:0}
-.toggle-slider{position:absolute;inset:0;background:rgba(255,105,180,.15);border-radius:12px;cursor:pointer;transition:.3s;border:1px solid rgba(255,105,180,.2)}
-.toggle-slider:before{content:'';position:absolute;width:18px;height:18px;left:3px;top:2px;background:#5a3060;border-radius:50%;transition:.3s}
-input:checked+.toggle-slider{background:linear-gradient(135deg,#ff69b4,#c77dff);border-color:transparent}
-input:checked+.toggle-slider:before{transform:translateX(20px);background:#fff}
-.schedule-row{display:flex;align-items:center;justify-content:space-between;padding:8px 0;font-size:12px;color:rgba(255,182,217,.6)}
-.schedule-row:not(:last-child){border-bottom:1px solid rgba(255,105,180,.1)}
-.schedule-row-label{letter-spacing:1px;text-transform:uppercase;font-size:11px;width:60px;font-weight:700}
-.time-input{background:rgba(255,105,180,.1);border:1px solid rgba(255,105,180,.2);color:#ffb6d9;font-family:'Quicksand',sans-serif;font-size:13px;font-weight:600;padding:4px 8px;border-radius:10px;width:88px;text-align:center}
-.schedule-temp-ctrl{display:flex;align-items:center;gap:8px}
-.sched-btn{background:rgba(255,105,180,.1);border:1px solid rgba(255,105,180,.2);color:rgba(255,182,217,.7);width:26px;height:26px;border-radius:50%;font-size:16px;cursor:pointer;display:flex;align-items:center;justify-content:center;font-family:'Quicksand',sans-serif}
-.sched-temp{font-size:13px;font-weight:700;background:linear-gradient(135deg,#ff69b4,#c77dff);-webkit-background-clip:text;-webkit-text-fill-color:transparent;min-width:52px;text-align:center}
-.sched-banner{border-radius:14px;padding:10px 16px;display:flex;align-items:center;gap:10px;margin-bottom:16px}
-.sched-banner.active{background:rgba(255,105,180,.12);border:1px solid rgba(255,105,180,.3)}
-.sched-banner.inactive{background:rgba(255,105,180,.05);border:1px solid rgba(255,105,180,.1)}
-.sched-dot{width:8px;height:8px;border-radius:50%;flex-shrink:0}
-.sched-banner.active .sched-dot{background:#ff69b4;box-shadow:0 0 6px #ff69b4;animation:pulse 2s infinite}
-.sched-banner.inactive .sched-dot{background:rgba(255,105,180,.3)}
-.sched-banner-text{font-size:12px;font-weight:600}
-.sched-banner.active .sched-banner-text{color:#ffb6d9}
-.sched-banner.inactive .sched-banner-text{color:rgba(255,182,217,.4)}
-.error-banner{background:rgba(255,68,102,.1);border:1px solid rgba(255,68,102,.3);border-radius:14px;padding:10px 16px;margin-bottom:16px;font-size:12px;color:#ff7799;text-align:center;display:none;font-weight:600}
-.sparkles{font-size:18px;display:flex;gap:6px;margin-bottom:6px}
+  *{box-sizing:border-box;margin:0;padding:0}
+  body{background:#111827;color:#f9fafb;font-family:'Segoe UI',system-ui,sans-serif;min-height:100vh;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:28px}
+  .ring{width:220px;height:220px;border-radius:50%;background:#1e2a3a;border:6px solid #334155;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:4px;transition:border-color .4s,box-shadow .4s}
+  .ring.heating{border-color:#f97316;box-shadow:0 0 28px #f9731640}
+  .ring.cooling{border-color:#38bdf8;box-shadow:0 0 28px #38bdf840}
+  .current-temp{font-size:64px;font-weight:300;line-height:1}
+  .current-temp .unit{font-size:22px;vertical-align:super;margin-left:2px}
+  .hvac-label{font-size:12px;letter-spacing:.12em;text-transform:uppercase;color:#94a3b8;margin-top:2px}
+  .humidity{font-size:13px;color:#64748b;margin-top:2px}
+  .status-badge{padding:5px 16px;border-radius:99px;font-size:12px;letter-spacing:.08em;text-transform:uppercase;font-weight:700;transition:all .3s}
+  .status-badge.on{background:#7c2d12;color:#fed7aa}
+  .status-badge.off{background:#1f2937;color:#6b7280}
+  .quick-label{font-size:11px;letter-spacing:.12em;text-transform:uppercase;color:#94a3b8;text-align:center}
+  .quick-btns{display:flex;gap:16px;align-items:center}
+  .qbtn{width:90px;height:90px;border-radius:50%;border:none;cursor:pointer;font-weight:700;font-size:20px;color:#fff;display:flex;flex-direction:column;align-items:center;justify-content:center;transition:transform .15s,box-shadow .15s,opacity .15s;line-height:1.1;box-shadow:0 4px 14px rgba(0,0,0,.4);-webkit-tap-highlight-color:transparent}
+  .qbtn:hover:not(:disabled){transform:scale(1.07)}
+  .qbtn:active:not(:disabled){transform:scale(.97)}
+  .qbtn:disabled{opacity:.4;cursor:not-allowed}
+  .qbtn .sub{font-size:11px;font-weight:400;opacity:.8}
+  .qbtn.btn-65{background:linear-gradient(145deg,#818cf8,#4f46e5)}
+  .qbtn.btn-68{background:linear-gradient(145deg,#0ea5e9,#0369a1)}
+  .qbtn.btn-72{background:linear-gradient(145deg,#f97316,#c2410c)}
+  .status-bar{height:20px;font-size:13px;color:#94a3b8;text-align:center}
+  .status-bar.success{color:#4ade80}
+  .status-bar.error{color:#f87171}
+  .status-bar.info{color:#60a5fa}
+  .conn{display:flex;align-items:center;gap:6px}
+  .conn-dot{width:8px;height:8px;border-radius:50%}
+  .conn-dot.good{background:#4ade80}
+  .conn-dot.bad{background:#f87171}
+  .conn-label{font-size:11px;color:#4b5563}
+  #pin-screen{display:flex;flex-direction:column;align-items:center;gap:16px}
+  #pin-screen h2{font-size:18px;color:#cbd5e1;font-weight:400}
+  #pin-input{background:#1e2a3a;border:1px solid #334155;color:#f9fafb;padding:10px 16px;border-radius:10px;font-size:18px;text-align:center;letter-spacing:.3em;width:160px;outline:none}
+  #pin-input:focus{border-color:#0ea5e9}
+  #pin-submit{padding:10px 28px;background:#0ea5e9;border:none;border-radius:10px;color:#fff;font-size:15px;font-weight:600;cursor:pointer}
+  #pin-submit:disabled{opacity:.5;cursor:not-allowed}
+  #pin-error{color:#f87171;font-size:13px;min-height:20px}
+  #thermostat-screen{display:none;flex-direction:column;align-items:center;gap:22px}
+  #thermostat-screen.active{display:flex}
+  .min-note{font-size:11px;color:#374151;text-align:center}
 </style>
 </head>
 <body>
-<div id="app">
-  <div class="app-header">
-    <div class="app-title">✨ My Thermostat ✨</div>
-    <div class="conn-dot" id="conn-dot"></div>
+<div id="pin-screen">
+  <h2>Thermostat</h2>
+  <p style="color:#64748b;font-size:13px">Enter PIN to continue</p>
+  <input id="pin-input" type="password" inputmode="numeric" maxlength="8" placeholder="...."/>
+  <button id="pin-submit" disabled>Enter</button>
+  <div id="pin-error"></div>
+</div>
+<div id="thermostat-screen">
+  <div class="ring" id="ring">
+    <div class="current-temp" id="current-temp">--<span class="unit">F</span></div>
+    <div class="hvac-label" id="hvac-label">--</div>
+    <div class="humidity" id="humidity"></div>
   </div>
-  <div class="nav-tabs">
-    <button class="nav-tab active" id="nav-home" onclick="showView('home')">🏠 Home</button>
-    <button class="nav-tab" id="nav-schedule" onclick="showView('schedule')">📅 Schedule</button>
+  <div class="status-badge off" id="status-badge">Heat is OFF</div>
+  <div class="quick-label">Set Temperature</div>
+  <div class="quick-btns">
+    <button class="qbtn btn-65" id="btn65">65<span class="sub">F</span></button>
+    <button class="qbtn btn-68" id="btn68">68<span class="sub">F</span></button>
+    <button class="qbtn btn-72" id="btn72">72<span class="sub">F</span></button>
   </div>
-  <div id="error-banner" class="error-banner"></div>
-  <div id="home-view" style="display:flex;flex-direction:column;align-items:center;width:100%">
-    <div class="mode-tabs">
-      <button class="mode-tab heat" id="tab-heat" onclick="setMode('heat')">🔥 Heat</button>
-      <button class="mode-tab cool" id="tab-cool" onclick="setMode('cool')">❄️ Cool</button>
-      <button class="mode-tab off" id="tab-off" onclick="setMode('off')">Off</button>
-    </div>
-    <div class="unit-toggle">
-      <button class="unit-btn active" id="btn-f" onclick="setUnit('F')">&deg;F</button>
-      <button class="unit-btn" id="btn-c" onclick="setUnit('C')">&deg;C</button>
-    </div>
-    <div class="thermostat-circle">
-      <div class="arc-container">
-        <svg viewBox="0 0 240 240" width="240" height="240">
-          <defs>
-            <linearGradient id="arcGrad" x1="0%" y1="0%" x2="100%" y2="100%">
-              <stop offset="0%" style="stop-color:#ff4d8d"/>
-              <stop offset="100%" style="stop-color:#c77dff"/>
-            </linearGradient>
-            <filter id="glow">
-              <feGaussianBlur stdDeviation="3" result="coloredBlur"/>
-              <feMerge><feMergeNode in="coloredBlur"/><feMergeNode in="SourceGraphic"/></feMerge>
-            </filter>
-          </defs>
-          <circle cx="120" cy="120" r="110" fill="none" stroke="rgba(255,105,180,.1)" stroke-width="3"/>
-          <circle cx="120" cy="120" r="110" fill="none" stroke="url(#arcGrad)" stroke-width="5" stroke-dasharray="691" stroke-dashoffset="691" stroke-linecap="round" id="arc" transform="rotate(-90 120 120)" filter="url(#glow)"/>
-          <circle cx="120" cy="120" r="103" fill="rgba(255,105,180,.04)"/>
-          <circle cx="120" cy="120" r="96" fill="#1a0828"/>
-        </svg>
-      </div>
-      <div class="circle-content">
-        <div class="sparkles">🌸✨🌸</div>
-        <div class="current-temp" style="position:relative"><span id="cur">--</span><span class="cur-unit" id="cur-unit">&deg;F</span></div>
-        <div class="status-label" id="hvac-status">LOADING</div>
-        <div class="humidity-label" id="hum-label"></div>
-      </div>
-    </div>
-    <div class="status-bar">
-      <div class="status-dot idle" id="status-dot"></div>
-      <div class="status-text" id="status-text">Connecting...</div>
-      <div class="schedule-badge" id="sched-badge" style="display:none">✨ Schedule</div>
-    </div>
-    <button class="quick-btn" onclick="setTemp(68)">
-      <span class="quick-btn-label">🌸 cozy mode 🌸</span>
-      Set to 68°F
-    </button>
-    <div class="section">
-      <div class="section-label">✨ Set Temperature ✨</div>
-      <div class="temp-control">
-        <button class="ctrl-btn" onclick="adj(-1)">&#8722;</button>
-        <div class="set-temp-display" style="position:relative"><span id="stmp">--</span><span class="stmp-unit" id="stmp-unit">&deg;F</span></div>
-        <button class="ctrl-btn" onclick="adj(1)">+</button>
-      </div>
-    </div>
-    <div class="divider"></div>
-    <div class="range-section">
-      <div class="section-label">Temp Range</div>
-      <div class="range-row">
-        <div class="range-label" style="color:#ff69b4">🔥 Heat</div>
-        <div class="range-ctrl">
-          <button class="range-btn" onclick="adjR('h',-1)">&#8722;</button>
-          <div class="range-temp" id="hr">--</div>
-          <button class="range-btn" onclick="adjR('h',1)">+</button>
-        </div>
-      </div>
-      <div class="range-row">
-        <div class="range-label" style="color:#c77dff">❄️ Cool</div>
-        <div class="range-ctrl">
-          <button class="range-btn" onclick="adjR('c',-1)">&#8722;</button>
-          <div class="range-temp" id="cr">--</div>
-          <button class="range-btn" onclick="adjR('c',1)">+</button>
-        </div>
-      </div>
-    </div>
-  </div>
-  <div id="schedule-view" style="display:none;width:100%">
-    <div id="sched-active-banner" class="sched-banner active" style="display:none">
-      <div class="sched-dot"></div>
-      <div class="sched-banner-text" id="sched-active-text">Schedule active ✨</div>
-    </div>
-    <div id="sched-inactive-banner" class="sched-banner inactive">
-      <div class="sched-dot"></div>
-      <div class="sched-banner-text">No schedule active right now 🌸</div>
-    </div>
-    <div class="schedule-card">
-      <div class="schedule-card-header"><div class="schedule-card-title">🌙 Night Schedule</div><label class="toggle-switch"><input type="checkbox" id="night-toggle" onchange="saveSchedule()"><span class="toggle-slider"></span></label></div>
-      <div class="schedule-row"><div class="schedule-row-label">From</div><input type="time" class="time-input" id="night-start" value="22:00" onchange="saveSchedule()"></div>
-      <div class="schedule-row"><div class="schedule-row-label">To</div><input type="time" class="time-input" id="night-end" value="10:00" onchange="saveSchedule()"></div>
-      <div class="schedule-row"><div class="schedule-row-label">Heat to</div><div class="schedule-temp-ctrl"><button class="sched-btn" onclick="adjSchedTemp('night',-1)">&#8722;</button><div class="sched-temp" id="night-temp">68°F</div><button class="sched-btn" onclick="adjSchedTemp('night',1)">+</button></div></div>
-    </div>
-    <div class="schedule-card">
-      <div class="schedule-card-header"><div class="schedule-card-title">☀️ Day Schedule</div><label class="toggle-switch"><input type="checkbox" id="day-toggle" onchange="saveSchedule()"><span class="toggle-slider"></span></label></div>
-      <div class="schedule-row"><div class="schedule-row-label">From</div><input type="time" class="time-input" id="day-start" value="10:00" onchange="saveSchedule()"></div>
-      <div class="schedule-row"><div class="schedule-row-label">To</div><input type="time" class="time-input" id="day-end" value="22:00" onchange="saveSchedule()"></div>
-      <div class="schedule-row"><div class="schedule-row-label">Heat to</div><div class="schedule-temp-ctrl"><button class="sched-btn" onclick="adjSchedTemp('day',-1)">&#8722;</button><div class="sched-temp" id="day-temp">70°F</div><button class="sched-btn" onclick="adjSchedTemp('day',1)">+</button></div></div>
-    </div>
+  <div class="min-note">Range: 50F - 90F</div>
+  <div class="status-bar" id="status-bar"></div>
+  <div class="conn">
+    <span class="conn-dot good" id="conn-dot"></span>
+    <span class="conn-label" id="conn-label">Connected</span>
   </div>
 </div>
 <script>
-const API='https://thermostat-81d90.web.app';
-const PIN='4321';
-const HDR={'x-pin':PIN};
-let S={unit:'F',hr:null,cr:null};
-let SC=JSON.parse(localStorage.getItem('sc6')||'null')||{nightOn:true,nightStart:'22:00',nightEnd:'10:00',nightTemp:68,dayOn:false,dayStart:'10:00',dayEnd:'22:00',dayTemp:70};
-function saveSchedule(){SC.nightOn=document.getElementById('night-toggle').checked;SC.nightStart=document.getElementById('night-start').value;SC.nightEnd=document.getElementById('night-end').value;SC.dayOn=document.getElementById('day-toggle').checked;SC.dayStart=document.getElementById('day-start').value;SC.dayEnd=document.getElementById('day-end').value;localStorage.setItem('sc6',JSON.stringify(SC));checkSchedule()}
-function loadScheduleUI(){document.getElementById('night-toggle').checked=SC.nightOn;document.getElementById('night-start').value=SC.nightStart;document.getElementById('night-end').value=SC.nightEnd;document.getElementById('day-toggle').checked=SC.dayOn;document.getElementById('day-start').value=SC.dayStart;document.getElementById('day-end').value=SC.dayEnd;document.getElementById('night-temp').textContent=SC.nightTemp+'°F';document.getElementById('day-temp').textContent=SC.dayTemp+'°F'}
-function adjSchedTemp(w,d){if(w==='night'){SC.nightTemp=Math.max(50,Math.min(90,SC.nightTemp+d));document.getElementById('night-temp').textContent=SC.nightTemp+'°F'}else{SC.dayTemp=Math.max(50,Math.min(90,SC.dayTemp+d));document.getElementById('day-temp').textContent=SC.dayTemp+'°F'}saveSchedule()}
-function timeToMins(t){const[h,m]=t.split(':').map(Number);return h*60+m}
-function nowMins(){const n=new Date();return n.getHours()*60+n.getMinutes()}
-function inRange(s,e,now){const sm=timeToMins(s),em=timeToMins(e);return sm<=em?sm<=now&&now<em:now>=sm||now<em}
-function showView(v){document.getElementById('home-view').style.display=v==='home'?'flex':'none';document.getElementById('schedule-view').style.display=v==='schedule'?'block':'none';document.getElementById('nav-home').classList.toggle('active',v==='home');document.getElementById('nav-schedule').classList.toggle('active',v==='schedule')}
-function setUnit(u){S.unit=u;document.getElementById('btn-f').classList.toggle('active',u==='F');document.getElementById('btn-c').classList.toggle('active',u==='C');fetchStatus()}
-function showError(msg){const b=document.getElementById('error-banner');b.textContent=msg||'';b.style.display=msg?'block':'none'}
-function setConn(s){document.getElementById('conn-dot').className='conn-dot'+(s==='online'?' online':s==='error'?' error':'')}
-function fetchStatus(){
-  fetch(API+'/api/status',{headers:HDR}).then(r=>r.json()).then(d=>{
-    if(d.error)throw new Error(d.error);
-    setConn('online');showError(null);
-    const cur=S.unit==='F'?d.currentTempF:d.currentTempC;
-    const tgt=S.unit==='F'?d.targetTempF:Math.round((d.targetTempF-32)*5/9);
-    document.getElementById('cur').textContent=Math.round(cur);
-    document.getElementById('stmp').textContent=tgt!=null?Math.round(tgt):'--';
-    document.getElementById('cur-unit').textContent=S.unit==='F'?'°F':'°C';
-    document.getElementById('stmp-unit').textContent=S.unit==='F'?'°F':'°C';
-    const hv=d.hvacStatus||'';
-    document.getElementById('hvac-status').textContent=hv||'IDLE';
-    document.getElementById('hum-label').textContent=d.humidity?d.humidity+'% humidity':'';
-    const dot=document.getElementById('status-dot');
-    dot.className='status-dot '+(hv==='HEATING'?'heating':hv==='COOLING'?'cooling':'idle');
-    document.getElementById('status-text').textContent=hv==='HEATING'?'Heating up! 🌸':hv==='COOLING'?'Cooling down ❄️':'At target temp ✨';
-    const mode=(d.mode||'').toLowerCase();
-    ['heat','cool','off'].forEach(m=>document.getElementById('tab-'+m).classList.toggle('active',mode===m));
-    if(d.allowedRange){if(S.hr==null)S.hr=d.allowedRange.min;if(S.cr==null)S.cr=d.allowedRange.max}
-    if(S.hr!=null)document.getElementById('hr').textContent=S.hr+'°F';
-    if(S.cr!=null)document.getElementById('cr').textContent=S.cr+'°F';
-    const pct=d.targetTempF!=null&&d.allowedRange?Math.max(0,Math.min(1,(d.targetTempF-d.allowedRange.min)/(d.allowedRange.max-d.allowedRange.min))):0.5;
-    document.getElementById('arc').setAttribute('stroke-dashoffset',691-(pct*691*0.75));
-  }).catch(e=>{setConn('error');showError('Could not connect 🌸 '+e.message)});
-}
-function setTemp(t){
-  fetch(API+'/api/temperature',{method:'POST',headers:{...HDR,'Content-Type':'application/json'},body:JSON.stringify({temperature:t})})
-    .then(r=>r.json()).then(d=>{if(d.error)throw new Error(d.error);setTimeout(fetchStatus,500)})
-    .catch(e=>showError('Could not set temp 🌸 '+e.message));
-}
-function setMode(m){
-  fetch(API+'/api/mode',{method:'POST',headers:{...HDR,'Content-Type':'application/json'},body:JSON.stringify({mode:m.toUpperCase()})})
-    .then(r=>r.json()).then(()=>setTimeout(fetchStatus,500))
-    .catch(()=>['heat','cool','off'].forEach(t=>document.getElementById('tab-'+t).classList.toggle('active',t===m)));
-}
-function adj(d){const cur=parseInt(document.getElementById('stmp').textContent)||70;setTemp(S.unit==='C'?Math.round((cur*9/5+32)+d):cur+d)}
-function adjR(t,d){if(t==='h'){S.hr=Math.max(50,Math.min(90,(S.hr||65)+d));document.getElementById('hr').textContent=S.hr+'°F'}else{S.cr=Math.max(50,Math.min(90,(S.cr||75)+d));document.getElementById('cr').textContent=S.cr+'°F'}}
-function checkSchedule(){
-  const now=nowMins();let active=false,label='';
-  if(SC.nightOn&&inRange(SC.nightStart,SC.nightEnd,now)){active=true;label='Night schedule: heating to '+SC.nightTemp+'°F'}
-  else if(SC.dayOn&&inRange(SC.dayStart,SC.dayEnd,now)){active=true;label='Day schedule: heating to '+SC.dayTemp+'°F'}
-  document.getElementById('sched-badge').style.display=active?'block':'none';
-  document.getElementById('sched-active-banner').style.display=active?'flex':'none';
-  document.getElementById('sched-inactive-banner').style.display=active?'none':'flex';
-  if(active)document.getElementById('sched-active-text').textContent=label+' ✨';
-}
-loadScheduleUI();fetchStatus();
-setInterval(fetchStatus,30000);setInterval(checkSchedule,60000);checkSchedule();
+(function(){
+  var API="https://renter-thermostat.web.app";
+  var pin="",currentStatus=null,pollTimer=null,failCount=0,statusTimer=null;
+  var pinScreen=document.getElementById("pin-screen"),pinInput=document.getElementById("pin-input"),pinSubmit=document.getElementById("pin-submit"),pinError=document.getElementById("pin-error"),thermostatScreen=document.getElementById("thermostat-screen"),ring=document.getElementById("ring"),currentTempEl=document.getElementById("current-temp"),hvacLabel=document.getElementById("hvac-label"),humidityEl=document.getElementById("humidity"),statusBadge=document.getElementById("status-badge"),statusBar=document.getElementById("status-bar"),connDot=document.getElementById("conn-dot"),connLabel=document.getElementById("conn-label"),btn65=document.getElementById("btn65"),btn68=document.getElementById("btn68"),btn72=document.getElementById("btn72");
+  function init(){pin=localStorage.getItem("thermostat_pin")||"";if(pin)authenticate();pinInput.addEventListener("input",function(){pinSubmit.disabled=pinInput.value.length<4;});pinInput.addEventListener("keydown",function(e){if(e.key==="Enter"&&pinInput.value.length>=4)submitPin();});pinSubmit.addEventListener("click",submitPin);btn65.addEventListener("click",function(){setTemp(65);});btn68.addEventListener("click",function(){setTemp(68);});btn72.addEventListener("click",function(){setTemp(72);});}
+  function submitPin(){pin=pinInput.value.trim();authenticate();}
+  function authenticate(){pinSubmit.disabled=true;pinError.textContent="";apiFetch("/api/status").then(function(resp){if(resp.ok){localStorage.setItem("thermostat_pin",pin);resp.json().then(function(data){showThermostat(data);startPolling();});}else if(resp.status===401){localStorage.removeItem("thermostat_pin");pin="";showPinError("Invalid PIN. Please try again.");pinSubmit.disabled=false;}else{showPinError("Connection error. Try again later.");pinSubmit.disabled=false;}}).catch(function(){showPinError("Cannot connect. Check internet.");pinSubmit.disabled=false;});}
+  function showPinError(msg){pinError.textContent=msg;pinScreen.style.display="";thermostatScreen.classList.remove("active");}
+  function showThermostat(data){currentStatus=data;pinScreen.style.display="none";thermostatScreen.classList.add("active");currentTempEl.innerHTML=data.currentTempF!=null?data.currentTempF+'<span class="unit">F</span>':'--<span class="unit">F</span>';humidityEl.textContent=data.humidity!=null?data.humidity+"% humidity":"";ring.className="ring";if(data.hvacStatus==="HEATING"){hvacLabel.textContent="Heating";ring.classList.add("heating");}else if(data.hvacStatus==="COOLING"){hvacLabel.textContent="Cooling";ring.classList.add("cooling");}else{hvacLabel.textContent="Idle";}var h=data.hvacStatus==="HEATING",c=data.hvacStatus==="COOLING";if(h){statusBadge.textContent="Heat is ON";statusBadge.className="status-badge on";}else if(c){statusBadge.textContent="Cool is ON";statusBadge.className="status-badge on";}else{statusBadge.textContent=data.mode==="COOL"?"Cool is OFF":"Heat is OFF";statusBadge.className="status-badge off";}var d=data.ecoMode;btn65.disabled=d;btn68.disabled=d;btn72.disabled=d;}
+  function setTemp(temp){setAllButtons(true);showStatus("info","Setting to "+temp+"F...");apiFetch("/api/temperature",{method:"POST",headers:{"Content-Type":"application/json"},body:JSON.stringify({temperature:temp})}).then(function(resp){resp.json().then(function(data){if(resp.ok){showStatus("success","Set to "+temp+"F");setTimeout(refreshStatus,2000);}else{showStatus("error",data.error||"Failed to set temperature");}});}).catch(function(){showStatus("error","Connection error.");}).then(function(){setAllButtons(false);});}
+  function setAllButtons(d){var e=currentStatus&&currentStatus.ecoMode;btn65.disabled=d||e;btn68.disabled=d||e;btn72.disabled=d||e;}
+  function startPolling(){if(pollTimer)clearInterval(pollTimer);pollTimer=setInterval(refreshStatus,10000);}
+  function refreshStatus(){apiFetch("/api/status").then(function(resp){if(resp.ok){failCount=0;setConn(true);resp.json().then(showThermostat);}else if(resp.status===401){clearInterval(pollTimer);localStorage.removeItem("thermostat_pin");pin="";pinScreen.style.display="";thermostatScreen.classList.remove("active");showPinError("Session expired.");}else{handleFail();}}).catch(handleFail);}
+  function handleFail(){failCount++;if(failCount>=2)setConn(false);}
+  function setConn(ok){connDot.className="conn-dot "+(ok?"good":"bad");connLabel.textContent=ok?"Connected":"Reconnecting...";}
+  function apiFetch(url,options){options=options||{};options.headers=options.headers||{};options.headers["x-pin"]=pin;return fetch(API+url,options);}
+  function showStatus(type,msg){clearTimeout(statusTimer);statusBar.textContent=msg;statusBar.className="status-bar "+type;if(type==="success"||type==="info"){statusTimer=setTimeout(function(){statusBar.textContent="";statusBar.className="status-bar";},4000);}}
+  init();
+})();
 </script>
 </body>
 </html>
